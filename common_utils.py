@@ -27,14 +27,12 @@ def permutation(nums):
 	nums = [1,2,3]
 	print(permutation(nums))
 	"""
-	if len(nums)<=1:
-		return [nums]
+	if len(nums)==0: return [[]]
 	result = []
 	for i in range(len(nums)):
 		select = nums[:i]+nums[i+1:]
-		per = permutation(select)
-		for x in per:
-			result.append(nums[i:i+1]+x)
+		for x in permutation(select):
+			result += [nums[i:i+1]+x]
 	return result
 
 
@@ -48,11 +46,8 @@ def combination(nums, r):
 	print(permutation(nums))
 	"""
 	if r == 0: return [[]]
-	r_result = []
+	result = []
 	for i in range(len(nums)):
-		for element in combination(nums[i+1:], r-1):
-			r_result += [nums[i:i+1] + element]
-	return r_result
-
-
-
+		for x in combination(nums[i+1:], r-1):
+			result += [nums[i:i+1] + x]
+	return result
