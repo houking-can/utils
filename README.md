@@ -1,2 +1,2 @@
-# utils
-Some useful scripts, including algotithm and nice code
+# DataRobot
+scripts for data processing
