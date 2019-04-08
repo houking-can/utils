@@ -19,6 +19,22 @@ def iter_files(path):
 	else:
 		raise RuntimeError('Path %s is invalid' % path)
 
+
+def judge_pure_english(keyword):
+	"""judge is pure english"""
+    return all(ord(c) < 128 for c in keyword)
+
+
+def readlines(path):
+	""" iterate file per line """
+    with open(path, 'r') as f:
+        while True:
+            line = f.readline()
+            if line:
+                yield line
+            else:
+                break
+
 def permutation(nums):
 	"""
 	generate permutation of nums
