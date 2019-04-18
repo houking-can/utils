@@ -43,9 +43,9 @@ def iter_files(path):
     if os.path.isfile(path):
         yield path
     elif os.path.isdir(path):
-        for dirpath, _, filenames in os.walk(path):
-            for f in filenames:
-                yield os.path.join(dirpath, f)
+        for dir_path, _, file_names in os.walk(path):
+            for f in file_names:
+                yield os.path.join(dir_path, f)
     else:
         raise RuntimeError('Path %s is invalid' % path)
 
