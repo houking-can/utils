@@ -9,6 +9,13 @@
 import os
 import shutil
 
+
+def basename(path):
+    while path.endswith('\\'):
+        path = path[:-1]
+    return os.path.basename(path)
+
+
 def minus(src,des,new):
     """src: path of 
        des: path of remove items

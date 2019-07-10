@@ -1,0 +1,1 @@
+python C:\Users\Houking\Desktop\run\BatRun.py -e  C:\Users\Houking\Desktop\run\pdf2html.exe -i C:\Users\Houking\Desktop\CCKS\data\task1\pdf -o C:\Users\Houking\Desktop\CCKS\data\task1\xml -f xml
