@@ -17,7 +17,7 @@ from docx import Document
 def check(file, args):
     check_time = time.time()
     if args.format == 'xml':
-        while time.time()-check_time < args.timeout:
+        while time.time() - check_time < args.timeout:
             blocking()
             try:
                 _ = parse(file)
@@ -26,7 +26,7 @@ def check(file, args):
                 continue
         return False
     if args.format == 'docx':
-        while time.time()-check_time < args.timeout:
+        while time.time() - check_time < args.timeout:
             blocking()
             try:
                 _ = Document(file)
@@ -35,7 +35,7 @@ def check(file, args):
                 continue
         return False
     if args.format == 'xlsx':
-        while time.time()-check_time < args.timeout:
+        while time.time() - check_time < args.timeout:
             blocking()
             try:
                 _ = xlrd.open_workbook(file)
@@ -79,7 +79,7 @@ def kill_tasks():
         for each in info:
             each = each.decode('utf-8')
             Popen("taskkill /pid %s -t -f" % each.split()
-                  [1], stdout=PIPE, stderr=STDOUT, shell=True)
+            [1], stdout=PIPE, stderr=STDOUT, shell=True)
 
 
 def get_child_windows(parent):
@@ -103,13 +103,17 @@ def blocking():
     if whd > 0:
         hwndChildList = get_child_windows(whd)
         for hwnd in hwndChildList:
-            title = win32gui.GetWindowText(hwnd)
-            class_name = win32gui.GetClassName(hwnd)
-            # print(title,class_name)
-            if (title=="确定(&O)" or title=="确定") and class_name=="Button":
-                win32api.SendMessage(hwnd, win32con.WM_LBUTTONDOWN, 0, 0)
-                win32api.SendMessage(hwnd, win32con.WM_LBUTTONUP, 0, 0)
-                break
+            try:
+                title = win32gui.GetWindowText(hwnd)
+                class_name = win32gui.GetClassName(hwnd)
+                # print(title,class_name)
+                if (title == "确定(&O)" or title == "确定") and class_name == "Button":
+                    win32api.SendMessage(hwnd, win32con.WM_LBUTTONDOWN, 0, 0)
+                    win32api.SendMessage(hwnd, win32con.WM_LBUTTONUP, 0, 0)
+                    break
+            except:
+                continue
+
 
 def main(args):
     kill_tasks()
@@ -121,7 +125,7 @@ def main(args):
 
     done = open(args.done_path, 'a+')
     fail = open(args.fail_path, 'a+')
-    converted = open(args.done_path).read()+open(args.fail_path).read()
+    converted = open(args.done_path).read() + open(args.fail_path).read()
 
     converted = converted.split('\n')
     if len(converted[-1]) < 2:
@@ -132,7 +136,7 @@ def main(args):
     print("Having converted %d" % HAVE_DONE)
     print("############ Starting Converting ############")
     files = list(iter_files(args.input))
-    files = list(set(files)-converted)
+    files = list(set(files) - converted)
     files.sort()
     for id, file in enumerate(files):
         print(file)
@@ -141,8 +145,8 @@ def main(args):
         if os.path.exists(save_path):
             print('exists!')
             if check(save_path, args) and not args.replace:
-                print('%d/%d done!' % (id+1, len(files)))
-                done.write(file+'\n')
+                print('%d/%d done!' % (id + 1, len(files)))
+                done.write(file + '\n')
                 done.flush()
                 continue
             else:
@@ -158,18 +162,20 @@ def main(args):
         while True:
             if os.path.exists(save_path):
                 if check(save_path, args):
-                    print('%d/%d ok!' % (id+1, len(files)))
-                    done.write(file+'\n')
+                    print('%d/%d ok!' % (id + 1, len(files)))
+                    done.write(file + '\n')
                     done.flush()
                     print("Time cost: %.2fs" % (time.time() - start_time))
                     kill_tasks()
                     break
                 else:
-                    print('Timeout! %d/%d fail!' % (id+1, len(files)))
+                    print('Timeout! %d/%d fail!' % (id + 1, len(files)))
                     kill_tasks()
-                    fail.write(file+'\n')
+                    fail.write(file + '\n')
                     fail.flush()
                     break
+            if time.time() - start_time > args.timeout:
+                break
             blocking()
 
     done.close()
