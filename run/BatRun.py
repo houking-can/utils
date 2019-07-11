@@ -1,23 +1,24 @@
-import os
-from subprocess import Popen, PIPE, STDOUT
-import time
 import argparse
-from os.path import exists, join
-import threading
+import os
 import shutil
-import xlrd
+import threading
 import time
-from docx import Document
-from xml.dom.minidom import parse
-import win32gui
 import win32api
+import win32gui
+from os.path import exists, join
+from subprocess import Popen, PIPE, STDOUT
+from xml.dom.minidom import parse
+
 import win32con
+import xlrd
+from docx import Document
 
 
 def check(file, args):
     check_time = time.time()
     if args.format == 'xml':
         while time.time()-check_time < args.timeout:
+            blocking()
             try:
                 _ = parse(file)
                 return True
@@ -26,6 +27,7 @@ def check(file, args):
         return False
     if args.format == 'docx':
         while time.time()-check_time < args.timeout:
+            blocking()
             try:
                 _ = Document(file)
                 return True
@@ -34,6 +36,7 @@ def check(file, args):
         return False
     if args.format == 'xlsx':
         while time.time()-check_time < args.timeout:
+            blocking()
             try:
                 _ = xlrd.open_workbook(file)
                 return True
@@ -95,16 +98,18 @@ def get_child_windows(parent):
     return hwndChildList
 
 
-def blocking(whd):
-    hwndChildList = get_child_windows(whd)
-    for hwnd in hwndChildList:
-        title = win32gui.GetWindowText(hwnd)
-        class_name = win32gui.GetClassName(hwnd)
-        # print(title,class_name)
-        if (title=="确定(&O)" or title=="确定") and class_name=="Button":
-            win32api.SendMessage(hwnd, win32con.WM_LBUTTONDOWN, 0, 0)
-            win32api.SendMessage(hwnd, win32con.WM_LBUTTONUP, 0, 0)
-            break
+def blocking():
+    whd = win32gui.FindWindow(0, 'Adobe Acrobat')
+    if whd > 0:
+        hwndChildList = get_child_windows(whd)
+        for hwnd in hwndChildList:
+            title = win32gui.GetWindowText(hwnd)
+            class_name = win32gui.GetClassName(hwnd)
+            # print(title,class_name)
+            if (title=="确定(&O)" or title=="确定") and class_name=="Button":
+                win32api.SendMessage(hwnd, win32con.WM_LBUTTONDOWN, 0, 0)
+                win32api.SendMessage(hwnd, win32con.WM_LBUTTONUP, 0, 0)
+                break
 
 def main(args):
     kill_tasks()
@@ -153,21 +158,20 @@ def main(args):
         while True:
             if os.path.exists(save_path):
                 if check(save_path, args):
-                    print('%d/%d done!' % (id+1, len(files)))
+                    print('%d/%d ok!' % (id+1, len(files)))
                     done.write(file+'\n')
                     done.flush()
-                    print(time.time() - start_time)
+                    print("Time cost: %.2fs" % (time.time() - start_time))
                     kill_tasks()
                     break
                 else:
-                    print('time out. %d/%d fail!' % (id+1, len(files)))
+                    print('Timeout! %d/%d fail!' % (id+1, len(files)))
                     kill_tasks()
                     fail.write(file+'\n')
                     fail.flush()
                     break
-            w1hd = win32gui.FindWindow(0, 'Adobe Acrobat')
-            if w1hd > 0:
-                blocking(w1hd)
+            blocking()
+
     done.close()
     fail.close()
 
