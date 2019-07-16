@@ -37,7 +37,7 @@ import shutil
 ground_truth = r'C:\Users\Houking\Desktop\CCKS\data\task1\json'
 model_output = r'C:\Users\Houking\Desktop\error\json'
 # model_output = r'C:\Users\Houking\Desktop\CCKS\output\task1'
-xml = r'C:\Users\Houking\Desktop\error\error\xml'
+xml = r'C:\Users\Houking\Desktop\error\xml'
 
 model = os.listdir(model_output)
 cnt = 0
@@ -80,7 +80,7 @@ for each in model:
 
                             log.write("%s" % (i_m["名称"])+'\n')
                             if i_m["附注"] != i_g["附注"]:
-                                log.write("%s  %s" % (i_m["附注"],i_g["附注"])+'\n')
+                                log.write("附注：%s  %s" % (i_m["附注"],i_g["附注"])+'\n')
                             if i_m["年初至报告期末"] != i_g["年初至报告期末"]:
                                 log.write("%s  %s" % (i_m["年初至报告期末"], i_g["年初至报告期末"])+'\n')
                             if i_m["上年年初至报告期末"] != i_g["上年年初至报告期末"]:
@@ -105,7 +105,7 @@ for each in model:
     # log.write(each)
     log.write('correct: %d\t res: %d\t ground: %d' % (each_correct, each_res, each_gro)+'\n\n')
 
-    # if each_gro-each_correct>10:
+    # if abs(each_gro-each_correct)>10:
     #     shutil.move(os.path.join(xml,name+'.xml'),r'C:\Users\Houking\Desktop\a')
     #     shutil.move(os.path.join(model_output,each),r'C:\Users\Houking\Desktop\a')
 log.write('correct: %d\t res: %d\t ground: %d\n' % (correct, res_total, gro_total))

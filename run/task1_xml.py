@@ -21,21 +21,27 @@ def iter_files(path):
 
 
 def format_row(columns, ids):
-    name = columns[ids[0]]
-    appendix = columns[ids[1]]
-    num1 = columns[ids[2]]
-    num2 = columns[ids[3]]
+    # name = re.sub('\s', '', columns[ids[0]])
+    # appendix = columns[ids[1]].replace('\n', '').strip()
+    # num1 = re.sub('\s', '', columns[ids[2]])
+    # num2 = re.sub('\s', '', columns[ids[3]])
+
+    name = columns[ids[0]].replace('\n', '').strip()
+    appendix = re.sub('\s', '', columns[ids[1]])
+    num1 = columns[ids[2]].replace('\n', '').strip()
+    num2 = columns[ids[3]].replace('\n', '').strip()
+
     if appendix == '-' or appendix == '—':
         appendix = ''
 
     if (name.endswith('：') or name.endswith(':')):
-        if num1 in ['-', '', '—'] and num2 in ['-', '', '—']:
+        if num1 in ['-', '', '—', '--'] and num2 in ['-', '', '—', '--']:
             num1 = None
             num2 = None
     else:
-        if num1 in ['-', '', '—']:
+        if num1 in ['-', '', '—', '--']:
             num1 = '0.00'
-        if num2 in ['-', '', '—']:
+        if num2 in ['-', '', '—', '--']:
             num2 = '0.00'
     return {"名称": name,
             "附注": appendix,
@@ -112,14 +118,12 @@ def extract(table, ids, start=1):
     for row in rows[start:]:
         try:
             columns = row.text.split('\n')
-            # columns = [each.text.replace('\n','').strip() for each in columns]
-            columns = [re.sub('\s','',each) for each in columns]
             table.append(format_row(columns, ids))
         except:
-            # columns = [each.text.replace('\n','').strip() for each in row.contents if not isinstance(each, str)]
-            columns = [re.sub('\s', '', each.text) for each in row.contents if not isinstance(each, str)]
-            if len(columns)!=4:
-                return []
+            columns = [each.text for each in row.contents if not isinstance(each, str)]
+            # columns = [re.sub('\s', '', each.text) for each in row.contents if not isinstance(each, str)]
+            if len(columns) != 4:
+                continue
             table.append(format_row(columns, [0, 1, 2, 3]))
     return table
 
@@ -144,8 +148,8 @@ def start(head):
 
 
 if __name__ == "__main__":
-    path = r'C:\Users\Houking\Desktop\error\error\xml'
-    save_path = r'C:\Users\Houking\Desktop\error\error\json'
+    path = r'C:\Users\Houking\Desktop\error\xml'
+    save_path = r'C:\Users\Houking\Desktop\error\json'
     files = [file for file in iter_files(path) if file.endswith('.xml')]
 
     for file in tqdm(files):
