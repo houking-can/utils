@@ -25,9 +25,12 @@ def iter_files(path):
 def get_paragraph(soup):
     ps = soup.body.text.split('\n')
     tmp = ''
+    flag = False
     for i in range(len(ps)):
         text = re.sub('\s', '', ps[i])
-        if len(text) > flag_len:
+        if not flag and len(text) > flag_len:
+            flag = True
+        if flag:
             tmp += text + ' '
         if "特此公告" in text:
             break
@@ -46,7 +49,7 @@ if __name__ == "__main__":
     path = r'C:\Users\Houking\Desktop\CCKS\data\task2\xml'
     save_path = r'C:\Users\Houking\Desktop\CCKS\output\task2'
     files = [file for file in iter_files(path) if file.endswith('.xml')]
-    # log = open('task2.log', 'w', encoding='utf-8')
+    log = open('task2.log', 'w', encoding='utf-8')
     flag_len = len('本公司及董事会全体成员保证信息披露内容的真实、准确和完整，没有虚假记载、误导性陈述或重大遗漏。')
     cnt=0
     for file in files:
@@ -61,18 +64,20 @@ if __name__ == "__main__":
             res[name]['证券代码'] = code
             res[name]['证券简称'] = company
             res[name]['人事变动'] = []
-            print(name)
+            # print(name)
             soup = BeautifulSoup(open(file, encoding='utf-8'), "lxml")
             sentences, entities = get_paragraph(soup)
             flag = False
             for i in range(len(sentences)):
-                if len(re.findall('(因|由于).*?(辞去|不再担任)', sentences[i])) > 0:
-                    print(entities[i])
+                if len(re.findall('(因|由于).*?(辞去|不再担任)', sentences[i])) > 0 or \
+                    len(re.findall('(先生|女士).*?(辞去|不再担任)', sentences[i])) > 0:
+                    # print(entities[i])
                     flag = True
                 if len(re.findall('(聘任|提名|选举|增补).*?(先生|女士).*?(为|担任)', sentences[i])) > 0:
-                    print(entities[i])
+                    # print(entities[i])
                     flag = True
             if not flag:
+                print(name)
                 cnt+=1
                 # fire = re.findall('(.{4}[先生|女士]).*因(.*原因).*辞去(.*)[职务|之职|一职]',sent)
                 # if len(fire) > 0 and fire[0] != ('', ''):
@@ -93,10 +98,10 @@ if __name__ == "__main__":
                 # hire = re.findall('.*聘任(.*[先生|女士])为(.*?)[，|（|。|的].*', sent)
                 # if len(hire) > 0 and hire[0] != ('', ''):
                 #     print('hire', hire)
-                # log.write(name + '\n')
-                # log.write('\n'.join(sentences))
-                # log.write('\n\n')
-            print('')
+                log.write(name + '\n')
+                log.write('\n'.join(sentences))
+                log.write('\n')
+
 
         except Exception as e:
             print(file)
