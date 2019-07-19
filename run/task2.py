@@ -69,7 +69,7 @@ if __name__ == "__main__":
                 if len(re.findall('(因|由于).*?(辞去|不再担任)', sentences[i])) > 0:
                     print(entities[i])
                     flag = True
-                if len(re.findall('(聘任|提名|选举).*?(为|担任)', sentences[i])) > 0:
+                if len(re.findall('(聘任|提名|选举|增补).*?(先生|女士).*?(为|担任)', sentences[i])) > 0:
                     print(entities[i])
                     flag = True
             if not flag:
