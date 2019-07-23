@@ -9,7 +9,6 @@ from xml.dom.minidom import parse
 
 import win32con
 import xlrd
-from docx import Document
 
 
 class Converter:
@@ -33,15 +32,7 @@ class Converter:
                 except:
                     continue
             return False
-        if self.format == 'docx':
-            while time.time() - check_time < self.timeout:
-                self.blocking()
-                try:
-                    _ = Document(file)
-                    return True
-                except:
-                    continue
-            return False
+
         if self.format == 'xlsx':
             while time.time() - check_time < self.timeout:
                 self.blocking()
