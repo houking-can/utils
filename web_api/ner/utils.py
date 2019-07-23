@@ -14,9 +14,9 @@ def str2bool(v):
 def get_entity(tag_seq, char_seq):
     PER = get_PER_entity(tag_seq, char_seq)
     TIT = get_TIT_entity(tag_seq, char_seq)
-    SEX = get_SEX_entity(tag_seq, char_seq)
+    # SEX = get_SEX_entity(tag_seq, char_seq)
     REA = get_REA_entity(tag_seq, char_seq)
-    return PER, SEX, TIT, REA
+    return PER, TIT, REA
 
 
 def get_PER_entity(tag_seq, char_seq):
